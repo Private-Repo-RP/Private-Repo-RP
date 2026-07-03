@@ -29,9 +29,7 @@ def private_panel(_):
             primary_button(text=_["S_B_6"], url=config.SUPPORT_CHANNEL),
             success_button(text=_["S_B_2"], url=config.SUPPORT_CHAT),
         ],
-        [
-            danger_button(text=_["S_B_5"], url=config.CHAT),
-            primary_button(text=_["S_B_7"], url=config.SOURCE),
-        ],
     ]
+    if config.SOURCE and config.SOURCE.startswith("http"):
+        buttons.append([primary_button(text=_["S_B_7"], url=config.SOURCE)])
     return buttons
