@@ -10,7 +10,7 @@ def help_pannel(_, START: Union[bool, int] = None):
     second = [
         primary_button(
             text=_["BACK_BUTTON"],
-            callback_data="settingsback_helper",
+            callback_data="settings_back_helper",
         ),
     ]
     mark = second if START else first
