@@ -1,5 +1,6 @@
 # © @BabiesIQ
 
+import asyncio
 import time
 import random
 from pyrogram import filters
@@ -94,6 +95,20 @@ async def start_pm(client, message: Message, _):
         served_chats = len(await get_served_chats())
         served_users = len(await get_served_users())
         UP, CPU, RAM, DISK = await bot_sys_stats()
+        # MTProto reaction on user's /start message
+        try:
+            await app.send_reaction(
+                chat_id=message.chat.id,
+                message_id=message.id,
+                emoji="🎵",
+            )
+        except Exception:
+            pass
+        # Premium animation before start message
+        _ANIMS = ["🎶", "🎵", "🎸", "🎹", "🥁", "🎺", "🎻", "🪗"]
+        anim = await message.reply_text(random.choice(_ANIMS))
+        await asyncio.sleep(1.2)
+        await anim.delete()
         await message.reply_photo(
             random.choice(YUMI_PICS),
             caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM,served_users,served_chats),
