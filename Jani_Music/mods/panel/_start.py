@@ -3,6 +3,7 @@
 import asyncio
 import time
 import random
+import requests
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
@@ -31,6 +32,53 @@ from strings import get_string
 YUMI_PICS = [
 config.START_IMG_URL,
 ]
+
+# Emojis for reaction on /start message
+VALID_EMOJII = ["🔥", "💋", "🥺", "😒", "💖", "💘", "💕", "✨", "🥰", "🍌", "💔", "😓", "🫧"]
+
+# Telegram premium message effect IDs (fire, confetti, balloons, love)
+EFFECT_IDS = [
+    5046509860389126442,
+    5107584321108051014,
+    5104841245755180586,
+    5159385139981059251,
+]
+
+
+def _markup_to_api(out):
+    """Convert Pyrogram InlineKeyboardButton rows to Bot API inline_keyboard format."""
+    keyboard = []
+    for row in out:
+        btn_row = []
+        for btn in row:
+            b = {"text": btn.text}
+            if getattr(btn, "callback_data", None):
+                b["callback_data"] = btn.callback_data
+            elif getattr(btn, "url", None):
+                b["url"] = btn.url
+            btn_row.append(b)
+        keyboard.append(btn_row)
+    return {"inline_keyboard": keyboard}
+
+
+def _api_send_photo(chat_id, photo, caption, out, effect_id):
+    """Send photo with premium message effect via raw Bot API."""
+    payload = {
+        "chat_id": chat_id,
+        "photo": photo,
+        "caption": caption,
+        "parse_mode": "HTML",
+        "message_effect_id": effect_id,
+        "reply_markup": _markup_to_api(out),
+    }
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{config.BOT_TOKEN}/sendPhoto",
+            json=payload,
+            timeout=15,
+        )
+    except Exception:
+        pass
 
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
@@ -95,27 +143,22 @@ async def start_pm(client, message: Message, _):
         served_chats = len(await get_served_chats())
         served_users = len(await get_served_users())
         UP, CPU, RAM, DISK = await bot_sys_stats()
-        # MTProto reaction on user's /start message
+        # Reaction on user's /start message via message.react()
         try:
-            await app.send_reaction(
-                chat_id=message.chat.id,
-                message_id=message.id,
-                emoji="🎵",
-            )
+            await message.react(random.choice(VALID_EMOJII))
         except Exception:
             pass
-        # Premium animation before start message
-        _ANIMS = ["🎶", "🎵", "🎸", "🎹", "🥁", "🎺", "🎻", "🪗"]
-        try:
-            anim = await message.reply_text(random.choice(_ANIMS))
-            await asyncio.sleep(1.2)
-            await anim.delete()
-        except Exception:
-            pass
-        await message.reply_photo(
+        # Send start photo with Telegram premium message effect
+        caption = _["start_2"].format(
+            message.from_user.mention, app.mention, UP, DISK, CPU, RAM, served_users, served_chats
+        )
+        await asyncio.to_thread(
+            _api_send_photo,
+            message.chat.id,
             random.choice(YUMI_PICS),
-            caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM,served_users,served_chats),
-            reply_markup=InlineKeyboardMarkup(out),
+            caption,
+            out,
+            random.choice(EFFECT_IDS),
         )
         if await is_on_off(2):
             return await app.send_message(
