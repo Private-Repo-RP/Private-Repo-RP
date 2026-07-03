@@ -54,38 +54,9 @@ def cookie_txt_file():
     cookie_file = os.path.join(cookie_dir, random.choice(cookies_files))
     return cookie_file
 
-def _progress_bar(percent: int) -> str:
-    """Return a green coloured progress bar string for the given percent (0-100)."""
-    filled = int(percent / 10)
-    empty  = 10 - filled
-    bar    = "█" * filled + "░" * empty
-    return f"<b>🟢 {bar} {percent}%</b>"
-
 async def _animated_progress(mystic, label: str, done_event: asyncio.Event):
-    """Show an animated progress bar in *mystic* until done_event is set."""
-    import time as _time
-    start = _time.time()
-    percent = 0
-    prev_text = ""
-    while not done_event.is_set():
-        elapsed = _time.time() - start
-        # Accelerate quickly at start, then slow near 95 %
-        percent = min(95, int(5 + elapsed * 4.5))
-        bar_line = _progress_bar(percent)
-        text = f"{bar_line}\n\n<b>{label}</b>"
-        if text != prev_text:
-            try:
-                await mystic.edit_text(text, parse_mode="html")
-                prev_text = text
-            except Exception:
-                pass
-        await asyncio.sleep(0.8)
-    # Show 100 % briefly
-    try:
-        bar_line = _progress_bar(100)
-        await mystic.edit_text(f"{bar_line}\n\n<b>{label}</b>", parse_mode="html")
-    except Exception:
-        pass
+    """No-op: progress shown only in inline button, not in caption."""
+    await done_event.wait()
 
 async def _download_media(link: str, kind: str, exts: list[str], wait: int = 60, mystic=None):
     vid = link.split("v=")[-1].split("&")[0]
