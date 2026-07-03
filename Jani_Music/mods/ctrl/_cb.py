@@ -27,12 +27,14 @@ from pyrogram.errors import (
 from Jani_Music.helpers._store import get_assistant
 from Jani_Music.helpers.wrap._lang import languageCB
 from Jani_Music.helpers._fmt import seconds_to_min
-from Jani_Music.helpers.kb import close_markup, stream_markup
+from Jani_Music.helpers.kb import close_markup, stream_markup, stream_markup_timer
+from Jani_Music.helpers._thumb import get_thumb
 from Jani_Music.helpers.flow._aclear import auto_clean
 from config import (
     BANNED_USERS,
     SOUNCLOUD_IMG_URL,
     STREAM_IMG_URL,
+    SUPPORT_CHAT,
     TELEGRAM_AUDIO_URL,
     TELEGRAM_VIDEO_URL,
     adminlist,
@@ -325,7 +327,7 @@ async def del_back_playlist(client, CallbackQuery, _):
                     if str(streamtype) == "audio"
                     else TELEGRAM_VIDEO_URL,
                     caption=_["stream_1"].format(
-                        config.SUPPORT_CHAT, title[:23], duration, user
+                        SUPPORT_CHAT, title[:23], duration, user
                     ),
                     reply_markup=InlineKeyboardMarkup(button),
                 )
@@ -338,7 +340,7 @@ async def del_back_playlist(client, CallbackQuery, _):
                     if str(streamtype) == "audio"
                     else TELEGRAM_VIDEO_URL,
                     caption=_["stream_1"].format(
-                        config.SUPPORT_CHAT, title[:23], duration, user
+                        SUPPORT_CHAT, title[:23], duration, user
                     ),
                     reply_markup=InlineKeyboardMarkup(button),
                 )
@@ -346,8 +348,10 @@ async def del_back_playlist(client, CallbackQuery, _):
                 db[chat_id][0]["markup"] = "tg"
             else:
                 button = stream_markup(_, chat_id)
-                run = await CallbackQuery.message.reply_text(
-                    text=_["stream_1"].format(
+                img = await get_thumb(videoid)
+                run = await CallbackQuery.message.reply_photo(
+                    photo=img,
+                    caption=_["stream_1"].format(
                         f"https://t.me/{app.username}?start=info_{videoid}",
                         title[:23],
                         duration,
@@ -356,7 +360,7 @@ async def del_back_playlist(client, CallbackQuery, _):
                     reply_markup=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
-                db[chat_id][0]["markup"] = "stream"
+                db[chat_id][0]["markup"] = "tg"
             await CallbackQuery.edit_message_text(txt, reply_markup=close_markup(_))
 
 async def markup_timer():
