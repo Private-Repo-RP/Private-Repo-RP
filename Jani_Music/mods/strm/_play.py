@@ -468,7 +468,7 @@ async def play_music(client, CallbackQuery, _):
         await CallbackQuery.answer()
     except:
         pass
-    Emoji = random.choice(EMOJIS)
+    Emoji = random.choice(EMOJII)
     mystic = await CallbackQuery.message.reply_photo(
         photo=config.START_IMG_URL,
         caption=_["play_2"].format(channel) if channel else f"⏳ {Emoji}",
@@ -555,7 +555,7 @@ async def BABYlists_command(client, CallbackQuery, _):
         await CallbackQuery.answer()
     except:
         pass
-    Emoji = random.choice(EMOJIS)
+    Emoji = random.choice(EMOJII)
     mystic = await CallbackQuery.message.reply_photo(
         photo=config.START_IMG_URL,
         caption=_["play_2"].format(channel) if channel else f"⏳ {Emoji}",
