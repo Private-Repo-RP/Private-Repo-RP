@@ -115,10 +115,13 @@ async def stream(
                         pass
                     run = mystic
                 except Exception:
+                    try:
+                        await mystic.delete()
+                    except Exception:
+                        pass
                     run = await app.send_photo(
                         original_chat_id,
                         photo=img,
-                        has_spoiler=True,
                         caption=cap,
                         reply_markup=InlineKeyboardMarkup(button),
                     )
@@ -209,10 +212,13 @@ async def stream(
                     pass
                 run = mystic
             except Exception:
+                try:
+                    await mystic.delete()
+                except Exception:
+                    pass
                 run = await app.send_photo(
                     original_chat_id,
                     photo=img,
-                    has_spoiler=True,
                     caption=cap,
                     reply_markup=InlineKeyboardMarkup(button),
                 )
@@ -267,9 +273,12 @@ async def stream(
                     pass
                 run = mystic
             except Exception:
+                try:
+                    await mystic.delete()
+                except Exception:
+                    pass
                 run = await app.send_photo(
                     original_chat_id,
-                    has_spoiler=True,
                     photo=config.SOUNCLOUD_IMG_URL,
                     caption=cap,
                     reply_markup=InlineKeyboardMarkup(button),
@@ -330,6 +339,10 @@ async def stream(
                     pass
                 run = mystic
             except Exception:
+                try:
+                    await mystic.delete()
+                except Exception:
+                    pass
                 run = await app.send_photo(
                     original_chat_id,
                     photo=photo,
@@ -405,10 +418,13 @@ async def stream(
                     pass
                 run = mystic
             except Exception:
+                try:
+                    await mystic.delete()
+                except Exception:
+                    pass
                 run = await app.send_photo(
                     original_chat_id,
                     photo=img,
-                    has_spoiler=True,
                     caption=cap,
                     reply_markup=InlineKeyboardMarkup(button),
                 )
@@ -431,8 +447,8 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            await mystic.edit_caption(
-                caption=_["queue_4"].format(position, title[:27], duration_min, user_name),
+            await mystic.edit_text(
+                _["queue_4"].format(position, title[:27], duration_min, user_name),
                 reply_markup=InlineKeyboardMarkup(button),
             )
         else:
@@ -465,10 +481,13 @@ async def stream(
                     pass
                 run = mystic
             except Exception:
+                try:
+                    await mystic.delete()
+                except Exception:
+                    pass
                 run = await app.send_photo(
                     original_chat_id,
                     photo=config.STREAM_IMG_URL,
-                    has_spoiler=True,
                     caption=cap,
                     reply_markup=InlineKeyboardMarkup(button),
                 )
