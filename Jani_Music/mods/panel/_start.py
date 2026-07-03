@@ -25,6 +25,7 @@ from Jani_Music.helpers._store import (
 from Jani_Music.helpers.wrap._lang import LanguageStart
 from Jani_Music.helpers._fmt import get_readable_time
 from Jani_Music.helpers.kb import help_pannel, private_panel, start_panel
+from Jani_Music.helpers._log import chat_log
 from config import BANNED_USERS
 from strings import get_string
 
@@ -222,6 +223,16 @@ async def welcome(client, message: Message):
                     reply_markup=InlineKeyboardMarkup(out),
                 )
                 await add_served_chat(message.chat.id)
+                asyncio.create_task(chat_log(message.chat.id, "join"))
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
+
+
+@app.on_message(filters.left_chat_member, group=-1)
+async def left_handler(client, message: Message):
+    try:
+        if message.left_chat_member and message.left_chat_member.id == app.id:
+            asyncio.create_task(chat_log(message.chat.id, "leave"))
+    except Exception:
+        pass

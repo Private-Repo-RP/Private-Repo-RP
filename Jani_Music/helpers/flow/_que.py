@@ -46,6 +46,19 @@ async def put_queue(
     else:
         db[chat_id].append(put)
     autoclean.append(file)
+    # Logger: send play/queue log to LOGGER_ID
+    try:
+        from Jani_Music.helpers._log import stream_log
+        pos = 0 if forceplay else (len(db.get(chat_id) or []) - 1)
+        log_type = "play" if pos == 0 else "queue"
+        asyncio.create_task(
+            stream_log(
+                chat_id, original_chat_id, title, user, user_id,
+                log_type, pos if log_type == "queue" else None,
+            )
+        )
+    except Exception:
+        pass
 
 async def put_queue_index(
     chat_id,
